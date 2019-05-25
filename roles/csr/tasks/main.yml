@@ -4,10 +4,10 @@
     msg: "Enter your vrf"
   name: vrf
 - 
-  name: "vrf "{{ item }}"
   ios_config: 
-    lines: 'ip vrf {{ item }}'
-   host: "{{ ansible_host }}"
-   password: admin
-   username: admin
+    host: "{{ ansible_host }}"
+    lines: "ip vrf {{ item }}"
+    password: admin
+    username: admin
+  name: "conf vrf"
   register: config
