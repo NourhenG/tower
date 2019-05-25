@@ -1,0 +1,188 @@
+--- 
+- 
+  tasks: 
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "ip vrf {{ var1 }}"
+          - "rd {{ var2 }}"
+          - "route-target both {{ var2 }}"
+          - exit
+        parents: "interface GigabitEthernet {{ var8 }}"
+        password: admin
+        username: admin
+      name: "Configuration du vrf"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "interface tunnel {{ var3 }}"
+          - "no sh"
+          - "ip vrf forwarding {{ var1 }}"
+          - "ip add {{ var4 }} 255.255.255.252"
+          - "ip mtu {{ var5 }}"
+          - "tunnel source {{ var6 }}"
+          - "tunnel mode ipsec ipv4"
+          - "tunnel destination {{ var7 }}"
+          - "tunnel protection ipsec profile {{ var1 }}"
+        password: admin
+        username: admin
+      name: "Configuration d interface Tunnel"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "interface GigabitEthernet {{ var8 }}"
+          - "no sh"
+          - "ip vrf forwarding {{ var1 }}"
+          - "ip add {{ var9 }} 255.255.255.252"
+          - "ip ospf {{ var10 }} area {{ var11 }}"
+          - "crypto map {{ var1 }}"
+          - exit
+        password: admin
+        username: admin
+      name: "Configuration d interface Gigabit d MPLS"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "interface GigabitEthernet {{ var3 }}"
+          - "no sh"
+          - "ip add {{ var6 }} 255.255.255.252"
+          - exit
+        password: admin
+        username: admin
+      name: "Configuration d interface Gigabit"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "crypto ipsec profile {{ var1 }}"
+          - "set transform-set AES-256-SHA"
+          - exit
+        password: admin
+        username: admin
+      name: "Configuration de crypto profile"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "crypto keyring {{ var1 }}"
+          - "pre-shared-key address {{ var7 }} key {{ var12 }}"
+        password: admin
+        username: admin
+      name: "Configuration de keyring"
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "crypto isakmp profile {{ var1 }}"
+          - "vrf {{ var1 }}"
+          - "keyring {{ var1 }}"
+          - "match identity address {{ var14 }} 255.255.255.252"
+          - exit
+        password: admin
+        username: admin
+      name: "Configuration de crypto isakmp"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "crypto isakmp policy {{ var3 }}"
+          - "encr aes 256"
+          - "authentication pre-share"
+          - "group {{ var13 }}"
+          - exit
+        password: admin
+        username: admin
+      name: "Configuration de crypto policy"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "crypto map {{ var1 }} {{ var3 }} ipsec-isakmp"
+          - "set peer {{ var14 }}"
+          - "set transform-set AES-256-SHA"
+          - "set pfs group{{ var13 }}"
+          - "set isakmp-profile {{ var1 }}"
+          - "match address {{ var1 }}"
+          - exit
+        password: admin
+        username: admin
+      name: "Configuration de crypto MAP"
+      register: config
+    - 
+      ios_config: 
+        host: "{{ ansible_host }}"
+        lines: 
+          - "do wr"
+        password: admin
+        username: admin
+      name: save
+      register: config
+  vars_prompt: 
+    - 
+      name: var1
+      private: false
+      prompt: "Enter your vrf name"
+    - 
+      name: var2
+      private: false
+      prompt: "Enter your id"
+    - 
+      name: var3
+      private: false
+      prompt: "Enter your interface Tunnel number"
+    - 
+      name: var4
+      private: false
+      prompt: "Enter your address d interface Tunnel"
+    - 
+      name: var5
+      private: false
+      prompt: "Enter your mtu"
+    - 
+      name: var6
+      private: false
+      prompt: "Enter your address source d interface Tunnel"
+    - 
+      name: var7
+      private: false
+      prompt: "Enter your address destination d interface Tunnel"
+    - 
+      name: var8
+      private: false
+      prompt: "Enter your interface Gigabit number"
+    - 
+      name: var9
+      private: false
+      prompt: "Enter your address d interface Gigabit"
+    - 
+      name: var10
+      private: false
+      prompt: "Enter your ospf number"
+    - 
+      name: var11
+      private: false
+      prompt: "Enter your area number"
+    - 
+      confirm: true
+      name: var12
+      private: true
+      prompt: "Enter your preshared key"
+    - 
+      name: var13
+      private: false
+      prompt: "Enter your group number 2 5 14 15 16 "
+    - 
+      name: var14
+      private: false
+      prompt: "Enter your address voisin "
